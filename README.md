@@ -81,7 +81,7 @@ This script is particularly useful in environments where secrets may change freq
 ***Execute the scripts with updated logic to read secrets path from ENV SECRETS_DIRS***
 `` python3 env_enhance_db_connect_secret_loader.py`` 
 
-***In another terminal add more variables as shown below and monitor the scripts progress**
+***In another terminal add more variables as shown below and monitor the scripts progress***
 
 ```bash
     echo "s3cr3tT0k3nValue" > ./local_watch/API_TOKEN
