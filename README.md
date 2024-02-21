@@ -1,93 +1,108 @@
 # Loading-secrets-from-directory-python
 
-Creating a MySQL application using Docker Compose involves several steps, including setting up a Docker Compose file for MySQL, preparing an initialization SQL script, configuring secrets for database access, and writing a Python application to interact with the database. Below is a step-by-step tutorial that incorporates using `secrets_loader.py` and `db_connect.py` scripts for managing database secrets dynamically in a local development environment.
+### Dynamic Database Connection Management with `db_connect-watchdog.py`
 
-### Step 1: Prepare Docker Compose File
+#### Objective
 
-Create a file named `docker-compose.yml` in your project directory with the following content. This defines a MySQL service with initial environment variables and mounts volumes for data persistence and initialization:
+Learn to automatically manage database connections in your Python applications by dynamically reloading secrets upon modification, using the `db_connect-watchdog.py` script.
 
-```yaml
-version: '3.8'
-services:
-  db:
-    image: mysql:8.0
-    cap_add:
-      - SYS_NICE
-    restart: always
-    environment:
-      - MYSQL_DATABASE=quotes
-      - MYSQL_ROOT_PASSWORD=london123
-    ports:
-      - '3306:3306'
-    volumes:
-      - db:/var/lib/mysql
-      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
-volumes:
-  db:
-    driver: local
+#### Pre-requisites
+
+- Python 3.x and MySQL installed on your system.
+- Access to a MySQL database.
+- `mysql-connector-python` and `watchdog` libraries installed. Install them using `pip3` if you haven't already:
+
+    ```bash
+    pip3 install mysql-connector-python watchdog
+    ```
+
+#### Step 1: Prepare Your Secrets
+
+1. **Create Secrets Directories**: Set up directories to store your database secrets.
+
+    ```bash
+    mkdir -p ./local_secrets ./local_watch/token-secrets
+    ```
+
+2. **Populate Secrets Files**: Add your database connection details to the `./local_secrets` directory:
+
+    ```bash
+    echo "127.0.0.1" > ./local_secrets/MYSQL_HOSTNAME
+    echo "root" > ./local_secrets/MYSQL_USERNAME
+    echo "london123" > ./local_secrets/MYSQL_PASSWORD
+    echo "quotes" > ./local_secrets/MYSQL_DB
+    echo "3306" > ./local_secrets/MYSQL_PORT
+    ```
+
+#### Step 2: Script Overview
+
+`db_connect-watchdog.py` uses the `watchdog` library to monitor the secrets directories for any changes, automatically reloading the database credentials and reconnecting to the MySQL database without manual intervention or restarting the application.
+
+#### Step 3: Running `db_connect-watchdog.py`
+
+1. **Execute the Script**:
+
+    In the terminal, run:
+
+    ```bash
+    python3 db_connect-watchdog.py
+    ```
+
+    This starts the monitoring of the `./local_secrets` and `./local_watch/token-secrets` directories.
+
+2. **Test by Modifying a Secret**:
+
+    Edit the password file to simulate an update:
+
+    ```bash
+    echo "newpassword123" > ./local_secrets/MYSQL_PASSWORD
+    ```
+
+3. **Watch for Script Response**:
+
+    The script detects the change, reloads the credentials, and attempts to reconnect to the database. Look for log messages indicating these actions.
+
+#### Step 4: Application Integration
+
+- Tailor `db_connect-watchdog.py` to fit specific application requirements, like supporting various database types or incorporating additional secret types.
+- Ensure thorough testing in a controlled environment before deploying to production.
+
+#### Conclusion
+
+`db_connect-watchdog.py` provides an effective method for applications to maintain up-to-date database connections by reacting to changes in configuration secrets in real-time. This tutorial walks you through setting up, executing, and leveraging this script for dynamic secrets management in your Python applications.
+
 ```
+### Step 5: Adding a Token Secret
 
-### Step 2: Create the MySQL Initialization Script
-
-Create a directory named `db` in your project directory, and inside it, create a file named `init.sql`. This file can contain SQL commands to initialize your database, such as creating tables or inserting initial data.
-
-Example `init.sql`:
-
-```sql
-
-CREATE DATABASE IF NOT EXISTS quotes;
-USE quotes;
-
-CREATE TABLE IF NOT EXISTS quotes (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    quote TEXT NOT NULL,
-    author VARCHAR(255) NOT NULL
-);
-
-INSERT INTO quotes (quote, author)
-VALUES ('Life is 10% what happens to us and 90% how we react to it.', 'Charles R. Swindoll');
-
-```
-
-### Step 3: Prepare Secrets for Database Connection
-
-Following the instructions, create a `local_secrets` directory and populate it with your MySQL connection details. Note the correction from "qoutes" to "quotes" for the `MYSQL_DB` file to match the database name defined in your Docker Compose file:
+Create a token secret within the `./local_watch/token-secrets` directory. This token might represent an API key, authentication token, or any other type of secret your application needs alongside database credentials:
 
 ```bash
-mkdir -p ./local_secrets
-echo "127.0.0.1" > ./local_secrets/MYSQL_HOSTNAME
-echo "root" > ./local_secrets/MYSQL_USERNAME
-echo "london123" > ./local_secrets/MYSQL_PASSWORD
-echo "quotes" > ./local_secrets/MYSQL_DB
-echo "3306" > ./local_secrets/MYSQL_PORT
+echo "s3cr3tT0k3nValue" > ./local_watch/token-secrets/API_TOKEN
 ```
 
-### Step 4: Install MySQL Connector
+This command creates a file named `API_TOKEN` containing the mock token value `s3cr3tT0k3nValue` in the `./local_watch/token-secrets` directory.
 
-Ensure you have the MySQL connector installed in your environment to allow Python to communicate with MySQL:
+### Step 6: Adjusting `db_connect-watchdog.py` to Acknowledge Token Secrets
 
-```bash
-pip3 install mysql-connector-python
+Even though `db_connect-watchdog.py` primarily focuses on establishing database connections using MySQL secrets, it's designed to load and be aware of all secrets in the specified directories. To demonstrate that `db_connect-watchdog.py` also loads the token secret, you might want to add a simple log message or print statement to confirm the API token is accessible after secrets are loaded:
+
+```python
+# Inside multi_db_connect.py, after initializing SecretsLoader and loading secrets
+api_token = secrets_loader.get_credential('API_TOKEN')
+print(f"API_TOKEN: {api_token}")
 ```
 
-### Step 5: Write Your Python Application (`db_connect.py`)
+This change doesn't alter the database connection logic but confirms that secrets beyond those required for the database can also be loaded and accessed, showcasing the script's flexibility.
 
-Refer to the previously provided `db_connect.py` script, ensuring it's configured to use the secrets from `./local_secrets`. This script will connect to the MySQL database and can be extended to perform database operations such as querying or updating data.
+### Step 7: Running and Testing
 
-### Step 6: Run Docker Compose
+After adding the token secret and adjusting `multi_db_connect.py`:
 
-Navigate to your project directory where `docker-compose.yml` is located and start your MySQL container:
+1. **Run `db_connect-watchdog.py`** in your terminal:
 
-```bash
-docker-compose up -d
-```
+    ```bash
+    python3 db_connect-watchdog.py
+    ```
 
-This command starts the MySQL service in detached mode. Your database will be initialized according to the `init.sql` script.
+2. **Observe the Output**: Look for the printout of the API token value among the startup logs. This confirms that `db_connect-watchdog.py` is correctly loading not just the database secrets but also other secrets like the API token.
 
-### Step 7: Run Your Python Application
-
-With the MySQL service running and accessible, execute your Python script to connect to the database using the secrets:
-
-```bash
-python db_connect.py
-```

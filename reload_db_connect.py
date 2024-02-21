@@ -15,11 +15,6 @@ class SecretsChangeHandler(FileSystemEventHandler):
         if not event.is_directory:
             logging.info(f"Detected change in: {event.src_path}")
             self.callback()
-            
-    def on_deleted(self, event):
-            if not event.is_directory:
-                logging.info(f"Detected deletion of: {event.src_path}")
-                self.callback()
 
 class DatabaseConnector:
     def __init__(self, secrets_dirs):
@@ -29,10 +24,6 @@ class DatabaseConnector:
         self.load_db_config()
         self.connect_to_database()
 
-        # After loading the secrets, access and print the API token
-        #api_token = self.secrets_loader.get_credential('API_TOKEN')
-        #print(f"API_TOKEN: {api_token}")  # Demonstrate that the token is loaded
-
     def load_db_config(self):
         self.db_config = {
             'host': self.secrets_loader.get_credential('MYSQL_HOSTNAME'),
@@ -41,7 +32,6 @@ class DatabaseConnector:
             'database': self.secrets_loader.get_credential('MYSQL_DB'),
             'port': int(self.secrets_loader.get_credential('MYSQL_PORT')),
         }
-
 
     def connect_to_database(self):
         if self.connection is not None:
@@ -66,22 +56,12 @@ class DatabaseConnector:
             observer.stop()
         observer.join()
 
-     #    def on_secrets_changed(self):
-     #        logging.info("Secrets changed. Reloading and reconnecting...")
-     #        self.secrets_loader.load_secrets()
-     #        self.load_db_config()
-     #        self.connect_to_database()
     def on_secrets_changed(self):
-         logging.info("Secrets changed. Waiting for file changes to settle...")
-         time.sleep(3)  # Wait a moment for the filesystem to update
-         self.secrets_loader.load_secrets()
-    
-         logging.info("Reloading and reconnecting with new secrets...")
-         self.load_db_config()
-         self.connect_to_database()
-    
-         api_token = self.secrets_loader.get_credential('API_TOKEN')
-         logging.info(f"Reloaded API_TOKEN: {api_token}")
+        logging.info("Secrets changed. Reloading and reconnecting...")
+        self.secrets_loader.load_secrets()
+        self.load_db_config()
+        self.connect_to_database()
+
 if __name__ == "__main__":
     secrets_dirs = ['./local_secrets', './local_watch/token-secrets']
     db_connector = DatabaseConnector(secrets_dirs)

@@ -18,6 +18,10 @@ class DatabaseConnector:
             'port': int(self.secrets_loader.get_credential('MYSQL_PORT')),
         }
 
+        # After loading the secrets, access and print the API token
+        api_token = self.secrets_loader.get_credential('API_TOKEN')
+        print(f"API_TOKEN: {api_token}")  # Demonstrate that the token is loaded
+
     def connect_to_database(self):
         """Establish a database connection using the loaded configuration."""
         try:
@@ -43,5 +47,5 @@ if __name__ == "__main__":
     #secrets_dirs = ['./local_watch/db-secrets', './local_watch/token-secrets']  # Example directories
     secrets_dirs = ['./local_secrets', './local_watch/token-secrets']  # Example directories
     connector = DatabaseConnector(secrets_dirs=secrets_dirs)
-    connector.run(reload_interval=300)  # Reload secrets every 5 minutes
+    connector.run(reload_interval=5)  # Reload secrets every 5 minutes
 
