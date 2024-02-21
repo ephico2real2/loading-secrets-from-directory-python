@@ -94,4 +94,55 @@ docker-compose up -d
 
 This command starts the MySQL service in detached mode. Your database will be initialized according to the `init.sql` script.
 
+### Step 7: Connect locally to mysql
+
+```
+mysql -h 127.0.0.1 -P3306 -p
+
+```
+
+```bash
+
+Enter password:
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 210
+Server version: 8.0.36 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2024, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| quotes             |
+| sys                |
++--------------------+
+5 rows in set (0.04 sec)
+
+mysql> use quotes;
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+mysql> show tables;
++------------------+
+| Tables_in_quotes |
++------------------+
+| quotes           |
++------------------+
+1 row in set (0.00 sec)
+
+mysql>
+
+```
+
 
