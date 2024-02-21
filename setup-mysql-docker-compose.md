@@ -2,9 +2,17 @@
 
 Creating a MySQL application using Docker Compose involves several steps, including setting up a Docker Compose file for MySQL, preparing an initialization SQL script, configuring secrets for database access, and writing a Python application to interact with the database. Below is a step-by-step tutorial that incorporates using `secrets_loader.py` and `db_connect.py` scripts for managing database secrets dynamically in a local development environment.
 
-### Step 1: Prepare Docker Compose File
+### Step 1: Install MYSQL client on your macbook and Prepare Docker Compose File
 
 Create a file named `docker-compose.yml` in your project directory with the following content. This defines a MySQL service with initial environment variables and mounts volumes for data persistence and initialization:
+
+```bash
+
+brew install mysql-client
+
+>>>> Add the mysql client to the shell PATH <<<<
+
+```
 
 ```yaml
 version: '3.8'
