@@ -142,3 +142,55 @@ However, for certain use cases (e.g., updating API keys or other non-Django-mana
 ### Conclusion
 
 Integrating dynamic secrets management into Django's `settings.py` enhances flexibility and security, especially in cloud environments or scenarios requiring frequent updates to configurations. While Django's design limits the dynamism of certain settings like database configurations, other settings can still be dynamically managed with careful planning and implementation. Always test thoroughly in a staging environment before rolling out changes to production to ensure stability and security.
+
+
+Incorporating the `on_secrets_changed` method into the Django integration context requires adjusting the approach slightly, given Django's architecture and how it manages settings. The direct dynamic updating of settings like `DATABASES` at runtime isn't straightforward due to Django's design, which freezes settings after startup for security and stability reasons. However, for other types of secrets that don't directly affect Django's core settings (like API keys, external service credentials, etc.), you can implement a mechanism to refresh these dynamically if they change.
+
+To effectively use an `on_secrets_changed` callback within a Django application context, especially for secrets like `CUSTOM_SECRET_1`, `CUSTOM_SECRET_2`, etc., you could consider the following strategy:
+
+### Strategy for `on_secrets_changed` in Django
+
+1. **Custom Django Command**: This command keeps running in the background (similar to `runserver`) and listens for file system changes to reload secrets.
+
+```python
+# In your_app/management/commands/watch_secrets.py
+
+from django.core.management.base import BaseCommand
+from django.conf import settings
+from your_app.utils.secrets_watchdog import DjangoSecretsWatchdog
+
+class Command(BaseCommand):
+    help = 'Watches secret files for changes and updates Django settings dynamically.'
+
+    def handle(self, *args, **options):
+        # Assuming DjangoSecretsWatchdog is adapted to work with Django
+        secrets_watchdog = DjangoSecretsWatchdog(
+            secrets_dirs=settings.SECRETS_DIRS,
+            on_secrets_changed=self.on_secrets_changed
+        )
+        secrets_watchdog.run()
+
+    def on_secrets_changed(self):
+        # Reload secrets and update settings
+        # Note: Directly modifying Django settings at runtime is not recommended.
+        # This should only update custom settings or trigger reloading where appropriate.
+        print("Secrets changed. Implement custom logic to handle this event.")
+```
+
+2. **Implementing Dynamic Updates**: For settings that can be dynamically updated without causing issues (non-Django core settings), you can implement the update logic within `on_secrets_changed`. This could involve refreshing API client configurations, updating application-level caches, or other custom settings that aren't frozen by Django.
+
+3. **Limitations**: Remember, you cannot dynamically change settings that affect Django's initialization (like database configurations) without restarting the application. For such changes, consider external triggers to restart your application safely.
+
+### Running the Command
+
+To run the custom command:
+
+```bash
+python manage.py watch_secrets
+```
+
+This command should be run in parallel to your Django application server (e.g., `runserver`, Gunicorn, or uWSGI process) in a development environment or as part of your deployment strategy in production.
+
+### Conclusion
+
+The `on_secrets_changed` method requires careful implementation in the Django context, primarily due to the framework's design around settings immutability. While direct integration for core settings like `DATABASES` isn't feasible without restarting the application, this approach allows for dynamic updates to custom application-level settings or secrets that can be modified at runtime. Always ensure that any dynamic settings management adheres to security best practices and thoroughly test your implementation to understand its implications fully.
