@@ -79,6 +79,7 @@ This script is particularly useful in environments where secrets may change freq
 ```
 
 ***Execute the scripts with updated logic to read secrets path from ENV SECRETS_DIRS***
+
 `` python3 env_enhance_db_connect_secret_loader.py`` 
 
 ***In another terminal add more variables as shown below and monitor the scripts progress***
