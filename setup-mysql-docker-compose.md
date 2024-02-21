@@ -72,12 +72,12 @@ echo "3306" > ./local_secrets/MYSQL_PORT
 
 ```
 
-### Step 4: Install MySQL Connector
+### Step 4: Install MySQL Connector for python and watchdog 
 
 Ensure you have the MySQL connector installed in your environment to allow Python to communicate with MySQL:
 
 ```bash
-pip3 install mysql-connector-python
+ pip3 install mysql-connector-python watchdog
 ```
 
 ### Step 5: Write Your Python Application (`db_connect.py`)
