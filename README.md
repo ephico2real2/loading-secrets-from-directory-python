@@ -64,7 +64,7 @@ This script is particularly useful in environments where secrets may change freq
 `` python3 enhance_db_connect_secret_loader.py ``
 
 
-3. **Populate Secrets Files as Environmental variable SECRETS_DIRS**: set the value of "SECRETS_DIRS" as show below
+3. ***Populate Secrets Files as Environmental variable SECRETS_DIRS***: set the value of "SECRETS_DIRS" as show below
 
 `` e.g export SECRETS_DIRS='/path/to/db_secrets, /path/to/other_secrets, /path/etc' ``
 
@@ -76,10 +76,15 @@ This script is particularly useful in environments where secrets may change freq
     echo "london123" > ./local_secrets/MYSQL_PASSWORD
     echo "quotes" > ./local_secrets/MYSQL_DB
     echo "3306" > ./local_secrets/MYSQL_PORT
+```
 
+***Execute the scripts with updated logic to read secrets path from ENV SECRETS_DIRS***
+`` python3 env_enhance_db_connect_secret_loader.py`` 
+
+***In another terminal add more variables as shown below and monitor the scripts progress**
+
+```bash
     echo "s3cr3tT0k3nValue" > ./local_watch/API_TOKEN
     echo "arn:aws:sns:us-east-1:123456789012:myTopic" > ./local_watch/AWS_SNS_TOPIC
     echo "kafka://mykafkaurl:9092" > ./local_watch/KAFKA_URL
 ```
-
-`` python3 env_enhance_db_connect_secret_loader.py`` 
