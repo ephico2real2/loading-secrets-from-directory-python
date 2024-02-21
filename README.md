@@ -1,6 +1,6 @@
 This script, designed for dynamic secrets management and database connection handling in Python, utilizes the `mysql-connector-python` library for MySQL database interactions, the `watchdog` library for monitoring filesystem changes, and a custom `SecretsLoader` class for managing secrets. Here's a breakdown of its components and functionality:
 
-***References >>> https://www.geeksforgeeks.org/create-a-watchdog-in-python-to-look-for-filesystem-changes <<< ***
+***References:https://www.geeksforgeeks.org/create-a-watchdog-in-python-to-look-for-filesystem-changes***
 
 ### Script Overview
 
