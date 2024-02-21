@@ -1,4 +1,4 @@
-# Loading-secrets-from-directory-python
+# Creating MYSQL using docker compose
 
 Creating a MySQL application using Docker Compose involves several steps, including setting up a Docker Compose file for MySQL, preparing an initialization SQL script, configuring secrets for database access, and writing a Python application to interact with the database. Below is a step-by-step tutorial that incorporates using `secrets_loader.py` and `db_connect.py` scripts for managing database secrets dynamically in a local development environment.
 
@@ -54,12 +54,14 @@ VALUES ('Life is 10% what happens to us and 90% how we react to it.', 'Charles R
 Following the instructions, create a `local_secrets` directory and populate it with your MySQL connection details. Note the correction from "qoutes" to "quotes" for the `MYSQL_DB` file to match the database name defined in your Docker Compose file:
 
 ```bash
-mkdir -p ./local_secrets
+mkdir -p ./local_secrets ./local_watch/token-secrets
+
 echo "127.0.0.1" > ./local_secrets/MYSQL_HOSTNAME
 echo "root" > ./local_secrets/MYSQL_USERNAME
 echo "london123" > ./local_secrets/MYSQL_PASSWORD
 echo "quotes" > ./local_secrets/MYSQL_DB
 echo "3306" > ./local_secrets/MYSQL_PORT
+
 ```
 
 ### Step 4: Install MySQL Connector
@@ -84,10 +86,4 @@ docker-compose up -d
 
 This command starts the MySQL service in detached mode. Your database will be initialized according to the `init.sql` script.
 
-### Step 7: Run Your Python Application
 
-With the MySQL service running and accessible, execute your Python script to connect to the database using the secrets:
-
-```bash
-python db_connect.py
-```
