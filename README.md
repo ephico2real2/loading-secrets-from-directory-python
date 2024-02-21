@@ -61,6 +61,29 @@ echo "s3cr3tT0k3nValue" > ./local_watch/token-secrets/API_TOKEN
 echo "arn:aws:sns:us-east-1:123456789012:myTopic" > ./local_watch/token-secrets/AWS_SNS_TOPIC
 echo "kafka://mykafkaurl:9092" > ./local_watch/token-secrets/KAFKA_URL
 
-python3 enhance_db_connect_secret_loader.py
+```
+
+`` python3 enhance_db_connect_secret_loader.py ``
+
+
+```bash
+echo "127.0.0.1" > ./local_secrets/MYSQL_HOSTNAME
+echo "root" > ./local_secrets/MYSQL_USERNAME
+echo "london123" > ./local_secrets/MYSQL_PASSWORD
+echo "quotes" > ./local_secrets/MYSQL_DB
+echo "3306" > ./local_secrets/MYSQL_PORT
+
+```
+
+`` e.g export SECRETS_DIRS='/path/to/db_secrets, /path/to/other_secrets, /path/etc' ``
+
+`` export SECRETS_DIRS='./local_secrets,./local_watch' ``
+
+`` python3 env_enhance_db_connect_secret_loader.py`` 
+
+```bash
+echo "s3cr3tT0k3nValue" > ./local_watch/API_TOKEN
+echo "arn:aws:sns:us-east-1:123456789012:myTopic" > ./local_watch/AWS_SNS_TOPIC
+echo "kafka://mykafkaurl:9092" > ./local_watch/KAFKA_URL
 
 ```
